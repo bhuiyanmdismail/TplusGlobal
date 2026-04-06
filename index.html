@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,263 +7,398 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            overflow-x: hidden;
-            width: 100%;
+        body { 
+            font-family: 'Noto Sans JP', sans-serif; 
+            overflow-x: hidden; 
+            width: 100%; 
+            -webkit-text-size-adjust: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            scroll-behavior: smooth;
+        }
+        
+        /* 言語切り替えの完全分離 */
+        .lang-en { display: none; }
+        .lang-en-active .lang-jp { display: none; }
+        .lang-en-active .lang-en { display: block; }
+
+        /* スクロールプログレスバー */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa, #2563eb);
+            z-index: 100;
+            transition: width 0.1s ease-out;
         }
 
-        .lang-en {
-            display: none;
+        /* レスポンシブ見出し */
+        .responsive-hero-title {
+            font-size: clamp(1.75rem, 6vw, 4rem);
+            line-height: 1.3;
         }
 
-        .lang-en-active .lang-jp {
-            display: none;
-        }
-
-        .lang-en-active .lang-en {
-            display: block;
-        }
-
-        .responsive-title {
-            font-size: clamp(1.4rem, 5vw, 3rem);
-            line-height: 1.4;
-        }
-
+        /* ヒーローセクション背景 */
         .hero-section {
-            background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(10, 25, 47, 0.85)),
-                url('https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg');
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), 
+                        url('https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg');
             background-size: cover;
             background-position: center;
+            background-attachment: fixed; /* パララックス効果 */
         }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(15px);
-            transition: all 0.8s ease-out;
+        /* ダイナミックアニメーション定義 */
+        .reveal-up { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: all 1s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .reveal-right { opacity: 0; transform: translateX(40px); transition: all 1s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        
+        .reveal-up.active, .reveal-left.active, .reveal-right.active { 
+            opacity: 1; transform: translate(0, 0); 
         }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* フロー矢印のアニメーション */
+        .flow-arrow-x { animation: move-x 1.5s infinite ease-in-out; display: inline-block; }
+        .flow-arrow-y { animation: move-y 1.5s infinite ease-in-out; display: inline-block; }
+        
+        @keyframes move-x {
+            0% { transform: translateX(-5px); opacity: 0.5; }
+            50% { transform: translateX(5px); opacity: 1; }
+            100% { transform: translateX(-5px); opacity: 0.5; }
+        }
+        @keyframes move-y {
+            0% { transform: translateY(-5px) rotate(90deg); opacity: 0.5; }
+            50% { transform: translateY(5px) rotate(90deg); opacity: 1; }
+            100% { transform: translateY(-5px) rotate(90deg); opacity: 0.5; }
+        }
+
+        /* テキストのグラデーションアニメーション */
+        .text-gradient-animate {
+            background: linear-gradient(270deg, #60a5fa, #3b82f6, #93c5fd, #2563eb);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 4s ease infinite;
+        }
+        @keyframes gradient-shift { 
+            0% {background-position: 0% 50%} 
+            50% {background-position: 100% 50%} 
+            100% {background-position: 0% 50%} 
+        }
+
+        /* 光のぼかし背景 */
+        .glow-bg {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.15);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
         }
     </style>
 </head>
+<body class="bg-slate-50 text-slate-800 relative">
 
-<body class="bg-slate-50 text-slate-800">
+    <!-- 読了プログレスバー -->
+    <div id="progress-bar" style="width: 0%;"></div>
 
-    <nav class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm">
-        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-10">
-            <div class="font-black tracking-tighter text-blue-900 italic md:text-xl">
+    <!-- ナビゲーション -->
+    <nav class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-8">
+            <div class="font-black tracking-tighter text-blue-900 italic text-lg md:text-2xl shrink-0">
                 Tplus Global Bridge
             </div>
-            <button id="langToggle"
-                class="bg-slate-900 text-white px-4 py-1.5 rounded-full font-bold hover:bg-blue-600 transition duration-300 text-[10px] md:text-xs shrink-0 ml-2">
-                <span class="lang-jp">Englishに切り替え</span>
-                <span class="lang-en">日本語に切り替え</span>
+            <button id="langToggle" class="bg-slate-900 text-white px-4 md:px-6 py-2 rounded-full font-bold hover:bg-blue-700 transition duration-300 text-xs md:text-sm shadow-md ml-4 shrink-0 hover:scale-105 active:scale-95">
+                <span class="lang-jp">English</span>
+                <span class="lang-en">日本語</span>
             </button>
         </div>
     </nav>
 
-    <header class="hero-section min-h-[75vh] flex items-center justify-center text-center px-4">
-        <div class="max-w-4xl reveal w-full">
-            <h1 class="responsive-title font-black text-white mb-6">
-                <span class="lang-jp">ただ人材を貸すのではない。<br><span class="text-blue-400">「企業の採用力」を創る。</span></span>
-                <span class="lang-en">We don’t just supply workers.<br><span class="text-blue-400">We empower hiring
-                        capacity.</span></span>
+    <!-- ヒーローセクション -->
+    <header class="hero-section min-h-[80vh] flex items-center justify-center text-center px-4 pt-16 relative overflow-hidden">
+        <!-- 動的な光の装飾 -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px] animate-pulse"></div>
+        
+        <div class="max-w-5xl reveal-up w-full z-10">
+            <h1 class="responsive-hero-title font-black text-white mb-6 md:mb-8 drop-shadow-2xl">
+                <span class="lang-jp">ただ人材を貸すのではない。<br><span class="text-gradient-animate">「企業の採用力」を創る。</span></span>
+                <span class="lang-en">We don’t just supply workers.<br><span class="text-gradient-animate">We make companies able to hire.</span></span>
             </h1>
-            <p class="text-xs md:text-lg font-medium text-slate-300 tracking-wide max-w-2xl mx-auto leading-relaxed">
+            <p class="text-sm md:text-xl font-bold text-slate-200 tracking-wide max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
                 <span class="lang-jp">低リスク・即収益化から始める、次世代の外国人材ビジネス構想</span>
                 <span class="lang-en">Next-gen foreign talent strategy starting from immediate profit.</span>
             </p>
         </div>
     </header>
 
-    <section class="py-12 md:py-20 px-4 md:px-6 max-w-6xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden grid lg:grid-cols-2 reveal border border-slate-100">
-            <div class="p-8 md:p-12 flex flex-col justify-center">
-                <h2 class="text-xl md:text-3xl font-black mb-5 border-l-4 border-green-500 pl-4">
+    <!-- 1. 収益化の仕組み -->
+    <section class="py-16 md:py-24 px-4 md:px-8 max-w-7xl mx-auto relative">
+        <div class="glow-bg top-0 right-0"></div>
+        <div class="bg-white rounded-2xl md:rounded-[2rem] shadow-2xl hover:shadow-3xl transition-shadow duration-500 overflow-hidden grid lg:grid-cols-2 reveal-up border border-slate-100 group">
+            <div class="p-6 md:p-12 lg:p-16 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -left-4 top-0 bottom-0 w-8 bg-green-500 transform -skew-x-12"></div>
+                <h2 class="text-2xl md:text-4xl font-black mb-6 md:mb-8 pl-8 relative z-10">
                     <span class="lang-jp">収益化の仕組み</span>
-                    <span class="lang-en">Revenue Stream</span>
+                    <span class="lang-en">How We Generate Revenue</span>
                 </h2>
-                <div class="space-y-4 text-sm md:text-base text-slate-600 leading-relaxed mb-6">
-                    <p class="lang-jp">SNSを通じて求職者の情報を獲得し、それを人材紹介会社や派遣会社に成果報酬ベースで提供。面談の実施、または採用決定のタイミングで収益を受け取ります。</p>
-                    <p class="lang-en">We generate seeker leads via SNS and provide them to agencies on a success-fee
-                        basis. We earn revenue per interview or successful hire.</p>
+                <div class="space-y-4 md:space-y-6 text-sm md:text-lg text-slate-600 leading-relaxed mb-8 relative z-10">
+                    <p class="lang-jp">SNSやデジタルチャネルを通じて外国人求職者のリードを獲得します。これらのリードを人材紹介会社や派遣会社に成果報酬ベースで提供します。</p>
+                    <p class="lang-en">We start by generating foreign job seeker leads through SNS and digital channels. These leads are provided to staffing and recruitment companies on a success-fee basis.</p>
+                    
+                    <p class="lang-jp">面談の実施、または採用決定のタイミングで１件ごとに収益が発生する仕組みです。</p>
+                    <p class="lang-en">We earn revenue per interview or per successful hire.</p>
                 </div>
-                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-                    <p class="text-green-700 font-black text-sm md:text-xl lang-jp">★ 成果報酬型：初期投資なしで即収益化</p>
-                    <p class="text-green-700 font-black text-sm md:text-xl lang-en">★ Success Fee: Immediate profit with
-                        zero risk</p>
+                <div class="bg-green-50 p-4 md:p-6 rounded-xl border border-green-200 relative z-10 hover:bg-green-100 transition-colors">
+                    <p class="text-green-700 font-black text-sm md:text-xl">
+                        <span class="lang-jp">★ 成果報酬型：初期投資なしで即収益化</span>
+                        <span class="lang-en">★ Success Fee: Immediate revenue, zero risk</span>
+                    </p>
                 </div>
             </div>
-            <div class="h-40 md:h-auto relative">
-                <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg"
-                    class="absolute inset-0 w-full h-full object-cover">
+            <div class="h-48 md:h-full relative min-h-[300px] overflow-hidden">
+                <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
             </div>
         </div>
     </section>
 
-    <section class="py-12 md:py-20 bg-slate-100 px-4">
-        <div class="max-w-5xl mx-auto text-center reveal">
-            <h2 class="text-xs md:text-base font-black mb-10 text-slate-400 tracking-[0.2em] uppercase italic">
+    <!-- 事業プロセスの流れ (Flow) -->
+    <section class="py-16 md:py-24 bg-slate-100 px-4 relative">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-xl md:text-3xl font-black mb-10 md:mb-16 text-slate-400 tracking-widest uppercase italic reveal-up">
                 <span class="lang-jp">事業プロセスの流れ</span>
-                <span class="lang-en">Operations Flow</span>
+                <span class="lang-en">How It Works</span>
             </h2>
-            <div class="flex flex-col md:flex-row items-center justify-center gap-3">
-                <div class="p-4 md:p-6 bg-white rounded-lg w-full font-bold text-sm shadow-sm border border-slate-200">
-                    <span class="lang-jp">人材獲得</span><span class="lang-en">Recruitment</span>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 reveal-up">
+                <div class="p-4 md:p-8 bg-white rounded-xl w-full font-black text-sm md:text-xl shadow-md border border-slate-200 hover:-translate-y-2 transition-transform duration-300">
+                    <span class="lang-jp">外国人材の集客</span><span class="lang-en">Foreign Workers</span>
                 </div>
-                <div class="text-blue-500 font-bold text-lg md:rotate-0 rotate-90">→</div>
-                <div class="p-4 md:p-6 bg-blue-600 text-white rounded-lg w-full font-bold text-sm shadow-md">
-                    <span class="lang-jp">独自の審査</span><span class="lang-en">Screening</span>
+                <!-- 動的矢印 -->
+                <div class="text-blue-500 font-bold text-2xl md:text-3xl my-2 md:my-0 hidden md:block flow-arrow-x">→</div>
+                <div class="text-blue-500 font-bold text-2xl md:text-3xl my-2 md:my-0 md:hidden flow-arrow-y">→</div>
+                
+                <div class="p-4 md:p-8 bg-blue-600 text-white rounded-xl w-full font-black text-sm md:text-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                    <span class="lang-jp">独自の審査・選別</span><span class="lang-en">Collect & Screen</span>
                 </div>
-                <div class="text-blue-500 font-bold text-lg md:rotate-0 rotate-90">→</div>
-                <div class="p-4 md:p-6 bg-blue-900 text-white rounded-lg w-full font-bold text-sm shadow-md">
-                    <span class="lang-jp">企業へ接続</span><span class="lang-en">Matching</span>
+                
+                <div class="text-blue-500 font-bold text-2xl md:text-3xl my-2 md:my-0 hidden md:block flow-arrow-x" style="animation-delay: 0.2s;">→</div>
+                <div class="text-blue-500 font-bold text-2xl md:text-3xl my-2 md:my-0 md:hidden flow-arrow-y" style="animation-delay: 0.2s;">→</div>
+                
+                <div class="p-4 md:p-8 bg-blue-900 text-white rounded-xl w-full font-black text-sm md:text-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
+                    <span class="lang-jp">企業・代理店へ接続</span><span class="lang-en">Connect to Clients</span>
                 </div>
-                <div class="text-blue-500 font-bold text-lg md:rotate-0 rotate-90">→</div>
-                <div class="p-4 md:p-6 bg-green-600 text-white rounded-lg w-full font-bold text-sm shadow-lg">
-                    <span class="lang-jp">収益確定</span><span class="lang-en">REVENUE</span>
+                
+                <div class="text-green-500 font-bold text-2xl md:text-3xl my-2 md:my-0 hidden md:block flow-arrow-x" style="animation-delay: 0.4s;">→</div>
+                <div class="text-green-500 font-bold text-2xl md:text-3xl my-2 md:my-0 md:hidden flow-arrow-y" style="animation-delay: 0.4s;">→</div>
+                
+                <div class="p-4 md:p-8 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl w-full font-black text-sm md:text-xl shadow-xl hover:-translate-y-2 transition-transform duration-300">
+                    <span class="lang-jp">収益（採用報酬）</span><span class="lang-en">Revenue (Per Hire)</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-16 md:py-24 px-4 max-w-6xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-10 items-center">
-            <div class="reveal">
-                <h2 class="text-2xl md:text-4xl font-black mb-6 leading-tight">
-                    <span class="lang-jp">第2段階：<br><span class="text-blue-600 font-black">受け入れ企業の直接開拓</span></span>
-                    <span class="lang-en">Phase 2:<br><span class="text-blue-600">Company Acquisition</span></span>
+    <!-- 事業ロードマップ (Phase 1, 2, 3 の詳細版) -->
+    <section class="py-16 md:py-24 bg-white px-4 md:px-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-100/50 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-16 md:mb-24 reveal-up">
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">
+                    <span class="lang-jp">事業ロードマップ</span>
+                    <span class="lang-en">Business Roadmap</span>
                 </h2>
-                <p class="text-sm md:text-base text-slate-500 leading-relaxed mb-6">
-                    <span class="lang-jp">飲食、宿泊、物流、製造など人手不足が深刻な業界へ直接アプローチ。採用プロセスを徹底的に簡略化し、企業の不安を安心に変えます。</span>
-                    <span class="lang-en">Directly target industries with labor shortages. We simplify hiring processes
-                        and remove corporate anxiety.</span>
-                </p>
-                <div
-                    class="p-5 md:p-6 bg-slate-900 text-white rounded-xl text-base md:text-xl font-black shadow-lg inline-block border-l-4 border-blue-500">
-                    <span class="lang-jp text-sm md:text-lg">私たちは「待つ」のではなく「自ら獲得」しに行きます。</span>
-                    <span class="lang-en text-sm md:text-lg">We don't wait for business—we go and take it.</span>
-                </div>
+                <div class="w-24 h-2 bg-gradient-to-r from-blue-400 to-blue-600 mx-auto mt-6 rounded-full"></div>
             </div>
-            <div class="rounded-xl overflow-hidden shadow-xl reveal h-56 md:h-[400px] mt-6 lg:mt-0">
-                <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg"
-                    class="w-full h-full object-cover">
+
+            <div class="space-y-20 md:space-y-32">
+                
+                <!-- Phase 1 -->
+                <div class="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
+                    <div class="order-2 lg:order-1 rounded-2xl md:rounded-3xl overflow-hidden shadow-xl reveal-left h-64 md:h-[450px] group border border-slate-100">
+                        <img src="https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    </div>
+                    <div class="order-1 lg:order-2 reveal-right">
+                        <h2 class="text-3xl md:text-5xl font-black mb-6 md:mb-8 leading-tight">
+                            <span class="lang-jp">第1段階：<br><span class="text-blue-600">成果報酬型リード事業</span></span>
+                            <span class="lang-en">Phase 1:<br><span class="text-blue-600">Performance-Based Lead Gen</span></span>
+                        </h2>
+                        <div class="space-y-4 md:space-y-6 text-sm md:text-lg text-slate-600 leading-relaxed mb-8">
+                            <p class="lang-jp">SNSやコンテンツを活用し、外国人求職者を強力に集客します。集めた人材を既存の人材紹介会社や派遣会社へリードとして提供します。</p>
+                            <p class="lang-en">Attract foreign job seekers powerfully using SNS and content. Provide these leads to existing recruitment and dispatch companies.</p>
+                            <p class="lang-jp">面談・採用ベースの成果報酬型で展開するため、初期投資を最小限に抑えつつ、短期間で確実な収益化が可能です。</p>
+                            <p class="lang-en">By deploying a success-fee model based on interviews and hires, we can generate reliable revenue in a short time while minimizing initial investment.</p>
+                        </div>
+                        <div class="p-5 md:p-8 bg-slate-900 text-white rounded-2xl text-base md:text-2xl font-black shadow-2xl inline-block border-l-4 md:border-l-8 border-blue-500 hover:bg-blue-800 transition-colors w-full md:w-auto">
+                            <span class="lang-jp">初期投資を最小限に抑え、確実な収益化を。</span>
+                            <span class="lang-en">Minimize initial investment, ensure reliable revenue.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 (Target design from screenshot) -->
+                <div class="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
+                    <div class="order-1 reveal-left">
+                        <h2 class="text-3xl md:text-5xl font-black mb-6 md:mb-8 leading-tight">
+                            <span class="lang-jp">第2段階：<br><span class="text-blue-600">受け入れ企業の直接開拓</span></span>
+                            <span class="lang-en">Phase 2:<br><span class="text-blue-600">Company Acquisition</span></span>
+                        </h2>
+                        <div class="space-y-4 md:space-y-6 text-sm md:text-lg text-slate-600 leading-relaxed mb-8">
+                            <p class="lang-jp">飲食、宿泊、物流、製造などの需要の高い業界へ直接アプローチします。事前スクリーニング済みの人材を提供し、採用プロセスを簡略化します。</p>
+                            <p class="lang-en">We directly approach companies in high-demand industries such as food service, hospitality, logistics, and manufacturing.</p>
+                            
+                            <p class="lang-jp">私たちの目標は、企業側の言語・文化・手続き面での「不安」を取り除き、外国人採用のハードルを根本から下げることです。</p>
+                            <p class="lang-en">We provide pre-screened foreign workers and simplify the hiring process. Our goal is to remove uncertainty and make hiring foreign talent easy.</p>
+                        </div>
+                        <div class="p-5 md:p-8 bg-slate-900 text-white rounded-2xl text-base md:text-2xl font-black shadow-2xl inline-block border-l-4 md:border-l-8 border-blue-500 hover:bg-blue-800 transition-colors w-full md:w-auto">
+                            <span class="lang-jp">「待つ」のではなく「自ら獲得」しに行きます。</span>
+                            <span class="lang-en">We don't wait for companies — we go and get them.</span>
+                        </div>
+                    </div>
+                    <div class="order-2 rounded-2xl md:rounded-3xl overflow-hidden shadow-xl reveal-right h-64 md:h-[450px] group border border-slate-100">
+                        <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
+                    <div class="order-2 lg:order-1 rounded-2xl md:rounded-3xl overflow-hidden shadow-xl reveal-left h-64 md:h-[450px] group border border-slate-100">
+                        <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    </div>
+                    <div class="order-1 lg:order-2 reveal-right">
+                        <h2 class="text-3xl md:text-5xl font-black mb-6 md:mb-8 leading-tight">
+                            <span class="lang-jp">第3段階：<br><span class="text-blue-600">派遣・紹介事業への拡張</span></span>
+                            <span class="lang-en">Phase 3:<br><span class="text-blue-600">Expansion to Staffing Ops</span></span>
+                        </h2>
+                        <div class="space-y-4 md:space-y-6 text-sm md:text-lg text-slate-600 leading-relaxed mb-8">
+                            <p class="lang-jp">当社保有（または取得予定）の人材派遣ライセンスを活用し、自社での人材派遣および紹介事業を本格的に開始します。</p>
+                            <p class="lang-en">Utilizing our staffing licenses, we will fully launch our own staffing and placement operations.</p>
+                            <p class="lang-jp">リード提供モデルから、高単価な紹介フィーと継続的な派遣ストック収益を両立するモデルへ移行します。将来的には海外人材（バングラデシュ等）との直接的な連携も視野に入れます。</p>
+                            <p class="lang-en">Transitioning from a lead-gen model to a high-margin recurring revenue model. In the future, we will establish direct connections with global talent hubs like Bangladesh.</p>
+                        </div>
+                        <div class="p-5 md:p-8 bg-slate-900 text-white rounded-2xl text-base md:text-2xl font-black shadow-2xl inline-block border-l-4 md:border-l-8 border-blue-500 hover:bg-blue-800 transition-colors w-full md:w-auto">
+                            <span class="lang-jp">継続的な派遣ストック収益と高単価モデルの確立。</span>
+                            <span class="lang-en">Establish recurring revenue and a high-margin model.</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <section class="py-16 md:py-20 bg-slate-900 text-white px-4">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-xl md:text-3xl font-black mb-10 text-center reveal tracking-widest uppercase">
-                <span class="lang-jp">事業ロードマップ</span>
-                <span class="lang-en">Business Roadmap</span>
-            </h2>
-            <div class="grid lg:grid-cols-3 gap-4 md:gap-6 reveal">
-                <div class="p-6 md:p-8 bg-slate-800 rounded-xl border border-slate-700 text-center">
-                    <p class="text-blue-400 font-bold mb-2 text-[10px]">
-                        <span class="lang-jp">第1段階</span><span class="lang-en">Phase 1</span>
-                    </p>
-                    <h3 class="text-base md:text-lg font-black mb-3">
-                        <span class="lang-jp">リード創出事業</span><span class="lang-en">Lead Generation</span>
-                    </h3>
-                    <p class="text-xs opacity-60">
-                        <span class="lang-jp">SNS集客によるリード提供。即時の収益化を実現。</span>
-                        <span class="lang-en">Attract seekers via SNS. Immediate revenue generation.</span>
-                    </p>
-                </div>
-                <div class="p-6 md:p-8 bg-blue-600 rounded-xl shadow-lg lg:scale-105 text-center">
-                    <p class="text-blue-100 font-bold mb-2 text-[10px]">
-                        <span class="lang-jp">第2段階</span><span class="lang-en">Phase 2</span>
-                    </p>
-                    <h3 class="text-base md:text-lg font-black mb-3">
-                        <span class="lang-jp">企業獲得・開拓</span><span class="lang-en">Acquisition</span>
-                    </h3>
-                    <p class="text-xs font-bold">
-                        <span class="lang-jp">直接アプローチによる企業ネットワークの構築。</span>
-                        <span class="lang-en">Building corporate networks through direct approach.</span>
-                    </p>
-                </div>
-                <div class="p-6 md:p-8 bg-slate-800 rounded-xl border border-slate-700 text-center">
-                    <p class="text-blue-400 font-bold mb-2 text-[10px]">
-                        <span class="lang-jp">第3段階</span><span class="lang-en">Phase 3</span>
-                    </p>
-                    <h3 class="text-base md:text-lg font-black mb-3">
-                        <span class="lang-jp">派遣・紹介事業</span><span class="lang-en">Staffing Ops</span>
-                    </h3>
-                    <p class="text-xs opacity-60">
-                        <span class="lang-jp">自社運営による利益率の最大化と安定収益化。</span>
-                        <span class="lang-en">Launching own operations for stable recurring revenue.</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-16 px-4">
-        <div class="max-w-3xl mx-auto text-center reveal">
-            <h2 class="text-lg md:text-2xl font-black mb-8 text-slate-400 tracking-widest uppercase italic">
+    <!-- 収益シミュレーション (Animated Numbers) -->
+    <section class="py-16 md:py-24 px-4 bg-slate-100 relative" id="revenue-section">
+        <div class="max-w-4xl mx-auto text-center reveal-up">
+            <h2 class="text-xl md:text-3xl font-black mb-8 md:mb-12 text-slate-500 tracking-widest uppercase italic">
                 <span class="lang-jp">収益シミュレーション</span>
-                <span class="lang-en">Revenue Simulation</span>
+                <span class="lang-en">Example Revenue Model</span>
             </h2>
-            <div class="bg-white p-6 md:p-10 rounded-2xl shadow-lg border-4 md:border-8 border-slate-50">
-                <div class="space-y-4 text-base md:text-xl font-bold text-left mb-6 border-b pb-6">
-                    <div class="flex justify-between">
-                        <span class="lang-jp">月間獲得リード数</span><span class="lang-en">Leads per Month</span>
-                        <span>100 件</span>
+            <div class="bg-white p-6 md:p-12 rounded-2xl md:rounded-[2.5rem] shadow-2xl border-t-8 border-blue-600 hover:shadow-blue-500/20 hover:-translate-y-2 transition-all duration-500">
+                <div class="space-y-4 md:space-y-6 text-sm md:text-2xl font-bold text-left mb-6 md:mb-10 border-b pb-6 md:pb-10">
+                    <div class="flex justify-between items-center">
+                        <span class="lang-jp">月間獲得リード数</span><span class="lang-en">Leads per month</span>
+                        <span class="text-blue-600"><span class="counter" data-target="100">0</span> 件</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="lang-jp">採用決定数 (20%)</span><span class="lang-en">Successful Hires</span>
-                        <span>20 名</span>
+                    <div class="flex justify-between items-center">
+                        <span class="lang-jp">採用決定数 (20%)</span><span class="lang-en">Successful hires (20%)</span>
+                        <span class="text-blue-600"><span class="counter" data-target="20">0</span> 名</span>
                     </div>
-                    <div class="flex justify-between text-slate-400 text-xs md:text-base">
-                        <span class="lang-jp">平均紹介報酬単価</span><span class="lang-en">Fee per Hire</span>
-                        <span>¥50,000</span>
+                    <div class="flex justify-between items-center text-slate-500">
+                        <span class="lang-jp">平均紹介報酬単価</span><span class="lang-en">Fee per hire</span>
+                        <span>¥<span class="counter" data-target="50000">0</span></span>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row justify-between items-center gap-2">
-                    <p class="text-base md:text-lg font-black">
-                        <span class="lang-jp">想定月間収益</span><span class="lang-en">Monthly Profit</span>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                    <p class="text-lg md:text-3xl font-black text-slate-700">
+                        <span class="lang-jp">想定月間収益</span><span class="lang-en">Total Revenue</span>
                     </p>
-                    <p class="text-3xl md:text-5xl font-black text-green-600">¥1,000,000</p>
+                    <p class="text-4xl md:text-6xl lg:text-7xl font-black text-green-600 drop-shadow-sm">¥<span class="counter" data-target="1000000">0</span></p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-12 md:py-20 bg-blue-50 px-4">
-        <div class="max-w-3xl mx-auto text-center reveal">
-            <h2 class="text-xl md:text-3xl font-black mb-6 text-blue-900 uppercase">
+    <!-- 今、取り組む理由 (Why Now) -->
+    <section class="py-16 md:py-24 bg-blue-50 px-4 relative overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full blur-3xl opacity-50"></div>
+        <div class="max-w-4xl mx-auto text-center reveal-up relative z-10">
+            <h2 class="text-2xl md:text-4xl font-black mb-6 md:mb-10 text-blue-900 uppercase">
                 <span class="lang-jp">今、取り組む理由</span><span class="lang-en">Why Now</span>
             </h2>
-            <p class="text-sm md:text-lg text-slate-700 leading-relaxed font-bold px-2">
-                <span
-                    class="lang-jp">日本は深刻な人手不足に直面しています。供給源は既に存在しますが、<b>「企業と人材を効率的につなぐピース」</b>が欠けています。私たちはその架け橋を担います。</span>
-                <span class="lang-en">Japan faces a growing labor shortage. Supply exists, but the <b>"efficient
-                        connection piece"</b> is missing. We fill that gap.</span>
-            </p>
+            <div class="bg-white/50 backdrop-blur-sm p-6 md:p-10 rounded-2xl border border-white shadow-sm">
+                <p class="text-sm md:text-xl text-slate-700 leading-relaxed font-bold px-2">
+                    <span class="lang-jp">日本は主要産業で深刻な人手不足に直面しています。外国人材の供給源は既に存在しますが、<span class="text-blue-700 bg-blue-100 px-2 rounded">「企業と人材を効率的につなぐピース」</span>が欠けています。私たちはその架け橋を最適化し、構造的なミスマッチを解消します。</span>
+                    <span class="lang-en">Japan faces a growing labor shortage across key industries. Foreign talent supply already exists. The missing piece is an <span class="text-blue-700 bg-blue-100 px-2 rounded">efficient connection</span> between workers and companies.</span>
+                </p>
+            </div>
         </div>
     </section>
 
-    <footer class="py-8 bg-white text-center border-t px-4">
-        <p class="text-xs md:text-base font-black text-slate-900 tracking-widest italic mb-1">Tplus Global Bridge</p>
-        <p class="text-[9px] md:text-xs text-slate-400">
-            <span class="lang-jp">© 2026 Tplus Global Bridge 外国人材マッチングプロジェクト</span>
+    <!-- フッター -->
+    <footer class="py-10 bg-slate-900 text-center px-4 border-t border-slate-800">
+        <p class="text-sm md:text-lg font-black text-white tracking-widest italic mb-2 uppercase">Tplus Global Bridge</p>
+        <p class="text-[10px] md:text-xs text-slate-400">
+            <span class="lang-jp">© 2026 Tplus Global Bridge 外国人材マッチング事業</span>
             <span class="lang-en">© 2026 Tplus Global Bridge Matching Project</span>
         </p>
     </footer>
 
     <script>
+        // 1. スクロールプログレスバー
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        });
+
+        // 2. 言語切り替え
         document.getElementById('langToggle').addEventListener('click', () => {
             document.body.classList.toggle('lang-en-active');
         });
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 3. 高度なスクロールRevealアニメーション
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { 
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+        document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // 4. 数字のカウントアップアニメーション（収益シミュレーション）
+        let counted = false;
+        const counterObserver = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting && !counted) {
+                counted = true;
+                const counters = document.querySelectorAll('.counter');
+                const speed = 200; // 低いほど速い
+
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText.replace(/,/g, '');
+                        const inc = target / speed;
+
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + inc).toLocaleString();
+                            setTimeout(updateCount, 15);
+                        } else {
+                            counter.innerText = target.toLocaleString();
+                        }
+                    };
+                    updateCount();
+                });
+            }
+        }, { threshold: 0.5 });
+        counterObserver.observe(document.getElementById('revenue-section'));
     </script>
 </body>
-
 </html>
