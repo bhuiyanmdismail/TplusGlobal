@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tplus Global Bridge | 実行計画書</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            word-break: keep-all;
+        }
+
+        .lang-en {
+            display: none;
+        }
+
+        .lang-en-active .lang-jp {
+            display: none;
+        }
+
+        .lang-en-active .lang-en {
+            display: block;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)),
+                url('https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+
+    <nav
+        class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 py-4 px-10 flex justify-between items-center shadow-sm">
+        <div class="text-2xl font-black tracking-tighter text-blue-900 italic">
+            Tplus Global Bridge
+        </div>
+        <button id="langToggle"
+            class="bg-slate-900 text-white px-6 py-2 rounded-full font-bold hover:bg-blue-600 transition duration-300">
+            <span class="lang-jp text-sm">Englishに切り替え</span>
+            <span class="lang-en text-sm">日本語に切り替え</span>
+        </button>
+    </nav>
+
+    <header class="hero-section min-h-screen flex items-center justify-center text-center px-6">
+        <div class="max-w-6xl reveal">
+            <h1 class="text-4xl md:text-7xl font-black text-white mb-10 leading-tight md:leading-[1.2]">
+                <span class="lang-jp">ただ人材を貸すのではない。<br><span class="text-blue-400">「企業の採用力」を創る。</span></span>
+                <span class="lang-en">Not just supplying workers.<br><span class="text-blue-400">We empower hiring
+                        capacity.</span></span>
+            </h1>
+            <p class="text-lg md:text-2xl font-medium text-slate-300 tracking-wide">
+                <span class="lang-jp">低リスク・即収益化から始める、次世代の外国人材ビジネス構想</span>
+                <span class="lang-en">Next-gen foreign talent strategy starting from immediate profit.</span>
+            </p>
+        </div>
+    </header>
+
+    <section class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden grid lg:grid-cols-2 reveal">
+            <div class="p-12 lg:p-16 flex flex-col justify-center">
+                <h2 class="text-4xl font-black mb-8 border-l-8 border-green-500 pl-6">
+                    <span class="lang-jp">収益化の仕組み</span>
+                    <span class="lang-en">Revenue Stream</span>
+                </h2>
+                <div class="space-y-6 text-xl text-slate-600 leading-relaxed mb-8">
+                    <p class="lang-jp">SNSを通じて求職者のリードを生成し、それを紹介・派遣会社へ提供。面談実施、または採用決定のタイミングで成果報酬を受け取ります。</p>
+                    <p class="lang-en">Generate leads via SNS and provide them to agencies. Earn fees per interview or
+                        successful hire.</p>
+                </div>
+                <div class="bg-green-50 p-6 rounded-2xl border border-green-200">
+                    <p class="text-green-700 font-black text-2xl lang-jp">★ 成果報酬型：初期投資なしで即収益化</p>
+                    <p class="text-green-700 font-black text-2xl lang-en">★ Success Fee: Immediate revenue, zero risk
+                    </p>
+                </div>
+            </div>
+            <div class="relative min-h-[400px]">
+                <img src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg"
+                    class="absolute inset-0 w-full h-full object-cover">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-slate-100 px-6">
+        <div class="max-w-6xl mx-auto text-center reveal">
+            <h2 class="text-3xl font-black mb-16 text-slate-400 tracking-[0.2em] uppercase italic">
+                <span class="lang-jp">事業プロセスの流れ</span>
+                <span class="lang-en">Operations Flow</span>
+            </h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <div class="p-8 bg-white rounded-xl w-full font-black text-xl shadow-md"><span
+                        class="lang-jp">人材獲得</span><span class="lang-en">Recruit</span></div>
+                <div class="text-blue-500 font-bold text-3xl">→</div>
+                <div class="p-8 bg-blue-600 text-white rounded-xl w-full font-black text-xl shadow-lg"><span
+                        class="lang-jp">独自の審査</span><span class="lang-en">Screen</span></div>
+                <div class="text-blue-500 font-bold text-3xl">→</div>
+                <div class="p-8 bg-blue-900 text-white rounded-xl w-full font-black text-xl shadow-lg"><span
+                        class="lang-jp">企業へ接続</span><span class="lang-en">Match</span></div>
+                <div class="text-blue-500 font-bold text-3xl">→</div>
+                <div class="p-8 bg-green-500 text-white rounded-xl w-full font-black text-xl shadow-xl"><span
+                        class="lang-jp">収益確定</span><span class="lang-en">REVENUE</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+            <div class="reveal">
+                <h2 class="text-5xl font-black mb-8 leading-tight">
+                    <span class="lang-jp">第2段階：<br><span class="text-blue-600">受け入れ企業の直接開拓</span></span>
+                    <span class="lang-en">Phase 2:<br><span class="text-blue-600">Active Acquisition</span></span>
+                </h2>
+                <p class="text-xl text-slate-500 leading-relaxed mb-8">
+                    <span class="lang-jp">飲食、宿泊、物流、製造など人手不足の最前線へ直接アプローチ。採用プロセスを徹底的に簡略化し、企業の「不安」を「安心」に変えます。</span>
+                    <span class="lang-en">Directly target labor-short sectors. We remove hiring friction and build
+                        corporate trust.</span>
+                </p>
+                <div
+                    class="p-8 bg-slate-900 text-white rounded-2xl text-2xl font-black shadow-2xl inline-block border-l-8 border-blue-500">
+                    <span class="lang-jp">「待つ」のではなく「自ら獲得」しに行きます。</span>
+                    <span class="lang-en">We don't wait for business—we take it.</span>
+                </div>
+            </div>
+            <div class="rounded-[3rem] overflow-hidden shadow-2xl reveal">
+                <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg"
+                    class="w-full h-[500px] object-cover">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-slate-900 text-white px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl font-black mb-20 text-center reveal">
+                <span class="lang-jp">事業ロードマップ</span>
+                <span class="lang-en">BUSINESS ROADMAP</span>
+            </h2>
+            <div class="grid lg:grid-cols-3 gap-12 reveal text-center">
+                <div class="p-10 bg-slate-800 rounded-3xl border border-slate-700 card-hover">
+                    <p class="text-blue-400 font-bold mb-4">
+                        <span class="lang-jp">第1段階</span><span class="lang-en">Phase 1</span>
+                    </p>
+                    <h3 class="text-2xl font-black mb-6 lang-jp">リード創出事業</h3>
+                    <h3 class="text-2xl font-black mb-6 lang-en">Lead Gen</h3>
+                    <p class="opacity-60 lang-jp">SNS集客によるリード提供。即時の収益化を実現。</p>
+                </div>
+                <div class="p-10 bg-blue-600 rounded-3xl shadow-2xl card-hover scale-105">
+                    <p class="text-blue-100 font-bold mb-4">
+                        <span class="lang-jp">第2段階</span><span class="lang-en">Phase 2</span>
+                    </p>
+                    <h3 class="text-2xl font-black mb-6 lang-jp">企業獲得・開拓</h3>
+                    <h3 class="text-2xl font-black mb-6 lang-en">Acquisition</h3>
+                    <p class="lang-jp font-bold">直接アプローチによる企業ネットワークの構築。</p>
+                </div>
+                <div class="p-10 bg-slate-800 rounded-3xl border border-slate-700 card-hover">
+                    <p class="text-blue-400 font-bold mb-4">
+                        <span class="lang-jp">第3段階</span><span class="lang-en">Phase 3</span>
+                    </p>
+                    <h3 class="text-2xl font-black mb-6 lang-jp">派遣・紹介事業</h3>
+                    <h3 class="text-2xl font-black mb-6 lang-en">Staffing</h3>
+                    <p class="opacity-60 lang-jp">自社運営による利益率の最大化と安定収益化。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <h2 class="text-4xl font-black mb-16 italic text-slate-800 tracking-tighter uppercase">
+                <span class="lang-jp">収益シミュレーション</span>
+                <span class="lang-en">Revenue Simulation</span>
+            </h2>
+            <div class="bg-white p-12 rounded-[3rem] shadow-2xl border-[12px] border-slate-50">
+                <div class="space-y-8 text-2xl font-bold text-left mb-12 border-b pb-12">
+                    <div class="flex justify-between items-center"><span class="lang-jp">月間リード数</span><span
+                            class="lang-en">Leads/mo</span> <span class="text-blue-600">100 件</span></div>
+                    <div class="flex justify-between items-center"><span class="lang-jp">採用決定数 (20%)</span><span
+                            class="lang-en">Hires</span> <span class="text-blue-600">20 名</span></div>
+                    <div class="flex justify-between items-center"><span
+                            class="lang-jp text-slate-400">平均紹介報酬</span><span class="lang-en text-slate-400">Average
+                            Fee</span> <span class="text-slate-400">¥50,000</span></div>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-2xl font-black lang-jp">想定月間収益</p>
+                    <p class="text-2xl font-black lang-en">Expected Profit</p>
+                    <p class="text-5xl md:text-7xl font-black text-green-600">¥1,000,000</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-blue-50 px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <h2 class="text-4xl font-black mb-10 text-blue-900 uppercase">
+                <span class="lang-jp">今、取り組む理由</span>
+                <span class="lang-en">Why Now</span>
+            </h2>
+            <p class="text-2xl text-slate-700 leading-relaxed font-bold">
+                <span
+                    class="lang-jp">日本は深刻な人手不足に直面しています。供給源は既に存在しますが、<b>「企業と人材を効率的につなぐピース」</b>が欠けています。私たちはその架け橋を担います。</span>
+                <span class="lang-en">Japan faces a growing labor shortage. Talent supply already exists. The missing
+                    piece is an efficient connection between workers and companies.</span>
+            </p>
+        </div>
+    </section>
+
+    <footer class="py-16 bg-white text-center border-t">
+        <p class="text-xl font-black text-slate-900 tracking-widest italic uppercase">Tplus Global Bridge</p>
+        <p class="text-xs text-slate-400 mt-2">
+            <span class="lang-jp">© 2026 Tplus Global Bridge 外国人材マッチングプロジェクト</span>
+            <span class="lang-en">© 2026 Tplus Global Bridge Matching Project</span>
+        </p>
+    </footer>
+
+    <script>
+        document.getElementById('langToggle').addEventListener('click', () => document.body.classList.toggle('lang-en-active'));
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
